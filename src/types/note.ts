@@ -3,3 +3,7 @@ export interface Note {
   content: string;
   tag: string;
 }
+
+export interface CreateNoteRequest {
+  data: Note;
+}

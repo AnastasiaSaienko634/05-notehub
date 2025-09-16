@@ -1,7 +1,26 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import css from "./NoteForm.module.css";
-//did it with Formik
+import { createNote } from "../services/noteService";
+import type { CreateNoteRequest } from "../types/note";
+
 const NoteForm = () => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: (newTask: CreateNoteRequest) => createNote(newTask),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] }); //для того щоб нотатки обновились
+    },
+    onError: () => {},
+  });
+
+  const handleSubmit = () => {
+    const newTask = "";
+    // mutation.mutate({"newTask"});
+  };
+
   return (
+    //did it with Formik
     <form className={css.form}>
       <div className={css.formGroup}>
         <label htmlFor="title">Title</label>
