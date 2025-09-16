@@ -13,7 +13,7 @@ export const fetchNotes = async () => {
   return response.data;
 };
 
-export const createNote = async (data: CreateNoteRequest) => {
+export const createNote = async (data) => {
   const response = await axios.post<Note>("", data);
   return response.data;
 };

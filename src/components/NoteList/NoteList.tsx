@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import css from "./NoteList.module.css";
-import { deleteNote } from "../services/noteService";
+import { deleteNote } from "../../services/noteService";
 
 const NoteList = () => {
   const queryClient = useQueryClient();
