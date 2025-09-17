@@ -1,23 +1,53 @@
-// fetchNotes : має виконувати запит для отримання колекції нотаток із сервера. Повинна підтримувати пагінацію (через параметр сторінки) та фільтрацію за ключовим словом (пошук);
-// createNote: має виконувати запит для створення нової нотатки на сервері. Приймає вміст нової нотатки та повертає створену нотатку у відповіді;
-// deleteNote: має виконувати запит для видалення нотатки за заданим ідентифікатором. Приймає ID нотатки та повертає інформацію про видалену нотатку у відповіді.
-// interface FetchNotesResponse
 import axios from "axios";
 import type { Note } from "../types/note";
-import type { CreateNoteRequest } from "../types/note";
 
-axios.defaults.baseURL = "";
+interface CreateNoteResponse {
+  note: Note;
+}
 
-export const fetchNotes = async () => {
-  const response = await axios.get("");
-  return response.data;
+interface fetchNotesResponse {
+  notes: Note[];
+  total_pages: number;
+}
+
+interface deleteNoteResponse {
+  note: Note;
+}
+
+axios.defaults.baseURL = "https://notehub-public.goit.study/api";
+const VITE_NOTEHUB_TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
+
+export const fetchNotes = async (
+  query: string,
+  currentPage: number
+): Promise<Note[]> => {
+  const response = await axios.get<fetchNotesResponse>("/notes", {
+    params: {
+      search: query,
+      page: currentPage,
+      perPage: 20,
+    },
+    headers: {
+      Authorization: `Bearer ${VITE_NOTEHUB_TOKEN}`,
+    },
+  });
+  return response.data.notes;
 };
 
-export const createNote = async (data) => {
-  const response = await axios.post<Note>("", data);
+export const createNote = async (note: Note): Promise<CreateNoteResponse> => {
+  const response = await axios.post<CreateNoteResponse>("/notes", note, {
+    headers: {
+      Authorization: `Bearer ${VITE_NOTEHUB_TOKEN}`,
+    },
+  });
   return response.data;
 };
 
 export const deleteNote = async (noteId: string) => {
-  await axios.delete<Note>(`${noteId}`);
+  const response = await axios.delete<deleteNoteResponse>(`/notes/${noteId}`, {
+    headers: {
+      Authorization: `Bearer ${VITE_NOTEHUB_TOKEN}`,
+    },
+  });
+  return response.data;
 };

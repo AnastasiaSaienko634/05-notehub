@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import css from "./NoteForm.module.css";
 import { createNote } from "../../services/noteService";
-import type { CreateNoteRequest } from "../../types/note";
-import { Formik, Form, Field } from "formik";
+import type { Note } from "../../types/note";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import toast from "react-hot-toast";
 
 interface NoteFormProps {
   onClose: () => void;
@@ -18,7 +20,7 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (newTask: CreateNoteRequest) => createNote(newTask),
+    mutationFn: (newTask: Note) => createNote(newTask),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] }); //для того щоб нотатки обновились
     },
@@ -31,6 +33,22 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
     tag: "",
   };
 
+  const NoteFormSchema = Yup.object().shape({
+    title: Yup.string()
+      .min(3, "Title must be at least 2 characters")
+      .max(50, "Title is too long")
+      .required("Title is required"),
+    content: Yup.string()
+      .required("Content is required")
+      .max(500, "Content is too long"),
+    tag: Yup.string()
+      .required("Tag is required")
+      .oneOf(
+        ["Todo", "Work", "Personal", "Meeting", "Shopping"],
+        "Tag must be one of: Todo, Work, Personal, Meeting, Shopping"
+      ),
+  });
+
   const handleSubmit = (values: InitialValues) => {
     if (values) {
       mutation.mutate({
@@ -38,18 +56,22 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
         content: values.content,
         tag: values.tag,
       });
+      onClose();
+      toast.success("You have successfully created a new note!");
     }
   };
 
   return (
-    //did it with Formik
-
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+    <Formik
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      validationSchema={NoteFormSchema}
+    >
       <Form className={css.form}>
         <div className={css.formGroup}>
           <label htmlFor="title">Title</label>
           <Field id="title" type="text" name="title" className={css.input} />
-          {/* <span name="title" className={css.error} /> */}
+          <ErrorMessage name="title" className={css.error} component="span" />
         </div>
 
         <div className={css.formGroup}>
@@ -61,7 +83,7 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
             rows={8}
             className={css.textarea}
           />
-          {/* <span name="content" className={css.error} /> */}
+          <ErrorMessage name="content" className={css.error} component="span" />
         </div>
 
         <div className={css.formGroup}>
@@ -73,7 +95,7 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
             <option value="Meeting">Meeting</option>
             <option value="Shopping">Shopping</option>
           </Field>
-          {/* <span name="tag" className={css.error} /> */}
+          <ErrorMessage name="tag" className={css.error} component="span" />
         </div>
 
         <div className={css.actions}>

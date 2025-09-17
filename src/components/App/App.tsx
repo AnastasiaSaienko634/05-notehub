@@ -8,32 +8,37 @@ import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import NoteList from "../NoteList/NoteList";
 import Modal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
+import { Toaster } from "react-hot-toast";
+import Pagination from "../Pagination/Pagination";
 
 const App = () => {
   const [isMOdalOpen, setIsModalOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const onOpen = () => setIsModalOpen(true);
   const onClose = () => setIsModalOpen(false);
-  //function Open and close modal
 
   const { error, data, isLoading } = useQuery({
-    queryKey: ["notes"],
-    queryFn: fetchNotes,
+    queryKey: ["notes", query, currentPage],
+    queryFn: () => fetchNotes(query, currentPage),
     placeholderData: keepPreviousData,
   });
 
   return (
     <div className={css.app}>
-      {isLoading && <Loader />}
-      {error && <ErrorMessage />}
+      <Toaster position="top-right" />
+
       <header className={css.toolbar}>
-        <SearchBox />
-        {/* Пагінація */}
+        <SearchBox setQuery={setQuery} query={query} />
+        <Pagination />
         <button className={css.button} onClick={onOpen}>
           Create note +
         </button>
       </header>
-      {data && <NoteList />}
+      {isLoading && <Loader isLoading={isLoading} />}
+      {error && <ErrorMessage />}
+      {data && data?.length > 0 && <NoteList notes={data} />}
       {isMOdalOpen && (
         <Modal onClose={onClose}>
           <NoteForm onClose={onClose} />
