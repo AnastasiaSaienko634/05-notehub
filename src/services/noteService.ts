@@ -7,7 +7,7 @@ interface CreateNoteResponse {
 
 interface fetchNotesResponse {
   notes: Note[];
-  total_pages: number;
+  totalPages: number;
 }
 
 interface deleteNoteResponse {
@@ -20,18 +20,18 @@ const VITE_NOTEHUB_TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
 export const fetchNotes = async (
   query: string,
   currentPage: number
-): Promise<Note[]> => {
+): Promise<fetchNotesResponse> => {
   const response = await axios.get<fetchNotesResponse>("/notes", {
     params: {
       search: query,
       page: currentPage,
-      perPage: 20,
+      perPage: 10,
     },
     headers: {
       Authorization: `Bearer ${VITE_NOTEHUB_TOKEN}`,
     },
   });
-  return response.data.notes;
+  return response.data;
 };
 
 export const createNote = async (note: Note): Promise<CreateNoteResponse> => {

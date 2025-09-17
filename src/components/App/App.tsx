@@ -19,7 +19,7 @@ const App = () => {
   const onOpen = () => setIsModalOpen(true);
   const onClose = () => setIsModalOpen(false);
 
-  const { error, data, isLoading } = useQuery({
+  const { error, data, isLoading, isSuccess } = useQuery({
     queryKey: ["notes", query, currentPage],
     queryFn: () => fetchNotes(query, currentPage),
     placeholderData: keepPreviousData,
@@ -30,15 +30,25 @@ const App = () => {
       <Toaster position="top-right" />
 
       <header className={css.toolbar}>
-        <SearchBox setQuery={setQuery} query={query} />
-        <Pagination />
+        <SearchBox
+          setQuery={setQuery}
+          query={query}
+          setCurrentPage={setCurrentPage}
+        />
+        {isSuccess && data.totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            total_pages={data.totalPages}
+          />
+        )}
         <button className={css.button} onClick={onOpen}>
           Create note +
         </button>
       </header>
       {isLoading && <Loader isLoading={isLoading} />}
       {error && <ErrorMessage />}
-      {data && data?.length > 0 && <NoteList notes={data} />}
+      {data && data?.notes.length > 0 && <NoteList notes={data.notes} />}
       {isMOdalOpen && (
         <Modal onClose={onClose}>
           <NoteForm onClose={onClose} />

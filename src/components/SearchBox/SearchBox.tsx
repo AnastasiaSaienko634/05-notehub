@@ -5,13 +5,15 @@ import { useState } from "react";
 interface SearchBoxProps {
   setQuery: (query: string) => void;
   query: string;
+  setCurrentPage: (number: number) => void;
 }
 
-const SearchBox = ({ setQuery, query }: SearchBoxProps) => {
+const SearchBox = ({ setQuery, query, setCurrentPage }: SearchBoxProps) => {
   const [inputValue, setInputValue] = useState(query);
-  const debouncedChange = useDebouncedCallback((value: string) =>
-    setQuery(value)
-  );
+  const debouncedChange = useDebouncedCallback((value: string) => {
+    setQuery(value);
+    setCurrentPage(1);
+  });
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
     if (event.target.value === "") {
