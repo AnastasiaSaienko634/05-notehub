@@ -1,10 +1,8 @@
 export interface Note {
-  id?: string;
+  id: string;
   title: string;
   content: string;
   tag: string;
-}
-
-export interface CreateNoteRequest {
-  note: Note;
+  createdAt: string;
+  updatedAt: string;
 }

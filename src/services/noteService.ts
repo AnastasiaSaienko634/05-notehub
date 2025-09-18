@@ -34,13 +34,13 @@ export const fetchNotes = async (
   return response.data;
 };
 
-export const createNote = async (note: Note): Promise<CreateNoteResponse> => {
+export const createNote = async (note: Note): Promise<Note> => {
   const response = await axios.post<CreateNoteResponse>("/notes", note, {
     headers: {
       Authorization: `Bearer ${VITE_NOTEHUB_TOKEN}`,
     },
   });
-  return response.data;
+  return response.data.note;
 };
 
 export const deleteNote = async (noteId: string) => {

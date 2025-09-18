@@ -11,9 +11,12 @@ interface NoteFormProps {
 }
 
 interface InitialValues {
+  id: string;
   title: string;
   content: string;
   tag: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const NoteForm = ({ onClose }: NoteFormProps) => {
@@ -23,24 +26,27 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
     mutationFn: (newTask: Note) => createNote(newTask),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] }); //для того щоб нотатки обновились
+      onClose();
+      toast.success("You have successfully created a new note!");
     },
     onError: () => {},
   });
 
   const initialValues: InitialValues = {
+    id: "",
     title: "",
     content: "",
     tag: "",
+    createdAt: "",
+    updatedAt: "",
   };
 
   const NoteFormSchema = Yup.object().shape({
     title: Yup.string()
-      .min(3, "Title must be at least 2 characters")
+      .min(3, "Title must be at least 3 characters")
       .max(50, "Title is too long")
       .required("Title is required"),
-    content: Yup.string()
-      .required("Content is required")
-      .max(500, "Content is too long"),
+    content: Yup.string().max(500, "Content is too long"),
     tag: Yup.string()
       .required("Tag is required")
       .oneOf(
@@ -52,12 +58,13 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
   const handleSubmit = (values: InitialValues) => {
     if (values) {
       mutation.mutate({
+        id: values.id,
         title: values.title,
         content: values.content,
         tag: values.tag,
+        createdAt: values.createdAt,
+        updatedAt: values.updatedAt,
       });
-      onClose();
-      toast.success("You have successfully created a new note!");
     }
   };
 
