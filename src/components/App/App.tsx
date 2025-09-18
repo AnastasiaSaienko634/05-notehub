@@ -10,6 +10,7 @@ import Modal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
 import { Toaster } from "react-hot-toast";
 import Pagination from "../Pagination/Pagination";
+import { useDebouncedCallback } from "use-debounce";
 
 const App = () => {
   const [isMOdalOpen, setIsModalOpen] = useState(false);
@@ -25,16 +26,17 @@ const App = () => {
     placeholderData: keepPreviousData,
   });
 
+  const debouncedChange = useDebouncedCallback((value: string) => {
+    setQuery(value);
+    setCurrentPage(1);
+  }, 1000);
+
   return (
     <div className={css.app}>
       <Toaster position="top-right" />
 
       <header className={css.toolbar}>
-        <SearchBox
-          setQuery={setQuery}
-          query={query}
-          setCurrentPage={setCurrentPage}
-        />
+        <SearchBox query={query} debouncedChange={debouncedChange} />
         {isSuccess && data.totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
