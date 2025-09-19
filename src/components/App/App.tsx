@@ -13,7 +13,7 @@ import Pagination from "../Pagination/Pagination";
 import { useDebouncedCallback } from "use-debounce";
 
 const App = () => {
-  const [isMOdalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -31,17 +31,21 @@ const App = () => {
     setCurrentPage(1);
   }, 1000);
 
+  const onPageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
   return (
     <div className={css.app}>
       <Toaster position="top-right" />
 
       <header className={css.toolbar}>
-        <SearchBox query={query} debouncedChange={debouncedChange} />
+        <SearchBox debouncedChange={debouncedChange} />
         {isSuccess && data.totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            total_pages={data.totalPages}
+            onPageChange={onPageChange}
+            totalPages={data.totalPages}
           />
         )}
         <button className={css.button} onClick={onOpen}>
@@ -51,7 +55,7 @@ const App = () => {
       {isLoading && <Loader isLoading={isLoading} />}
       {error && <ErrorMessage />}
       {data && data?.notes.length > 0 && <NoteList notes={data.notes} />}
-      {isMOdalOpen && (
+      {isModalOpen && (
         <Modal onClose={onClose}>
           <NoteForm onClose={onClose} />
         </Modal>

@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import css from "./NoteForm.module.css";
 import { createNote } from "../../services/noteService";
-import type { Note } from "../../types/note";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
@@ -10,20 +9,17 @@ interface NoteFormProps {
   onClose: () => void;
 }
 
-interface InitialValues {
-  id: string;
+interface CreateNote {
   title: string;
   content: string;
   tag: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 const NoteForm = ({ onClose }: NoteFormProps) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (newTask: Note) => createNote(newTask),
+    mutationFn: (newTask: CreateNote) => createNote(newTask),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] }); //для того щоб нотатки обновились
       onClose();
@@ -32,13 +28,10 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
     onError: () => {},
   });
 
-  const initialValues: InitialValues = {
-    id: "",
+  const initialValues: CreateNote = {
     title: "",
     content: "",
-    tag: "",
-    createdAt: "",
-    updatedAt: "",
+    tag: "Todo",
   };
 
   const NoteFormSchema = Yup.object().shape({
@@ -55,15 +48,12 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
       ),
   });
 
-  const handleSubmit = (values: InitialValues) => {
+  const handleSubmit = (values: CreateNote) => {
     if (values) {
       mutation.mutate({
-        id: values.id,
         title: values.title,
         content: values.content,
         tag: values.tag,
-        createdAt: values.createdAt,
-        updatedAt: values.updatedAt,
       });
     }
   };

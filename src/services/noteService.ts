@@ -1,6 +1,12 @@
 import axios from "axios";
 import type { Note } from "../types/note";
 
+interface CreateNoteProps {
+  title: string;
+  content: string;
+  tag: string;
+}
+
 interface CreateNoteResponse {
   note: Note;
 }
@@ -34,7 +40,7 @@ export const fetchNotes = async (
   return response.data;
 };
 
-export const createNote = async (note: Note): Promise<Note> => {
+export const createNote = async (note: CreateNoteProps): Promise<Note> => {
   const response = await axios.post<CreateNoteResponse>("/notes", note, {
     headers: {
       Authorization: `Bearer ${VITE_NOTEHUB_TOKEN}`,
@@ -43,11 +49,11 @@ export const createNote = async (note: Note): Promise<Note> => {
   return response.data.note;
 };
 
-export const deleteNote = async (noteId: string) => {
+export const deleteNote = async (noteId: string): Promise<Note> => {
   const response = await axios.delete<deleteNoteResponse>(`/notes/${noteId}`, {
     headers: {
       Authorization: `Bearer ${VITE_NOTEHUB_TOKEN}`,
     },
   });
-  return response.data;
+  return response.data.note;
 };
